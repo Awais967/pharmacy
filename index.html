@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pharmacy Management System</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Inter;
+      }
+
+      body {
+        background: linear-gradient(135deg, #e0f7ff, #f7faff);
+        min-height: 100vh;
+      }
+
+      header {
+        background: linear-gradient(90deg, #2a7fff, #00c2ff);
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      header h1 {
+        font-size: 20px;
+      }
+
+      .container {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 20px;
+      }
+
+      .panel {
+        background: white;
+        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      input,
+      button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 8px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+      }
+
+      button {
+        background: linear-gradient(90deg, #3cb371, #2a7fff);
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .products {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .card {
+        background: white;
+        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        transition: 0.3s;
+        animation: pop 0.4s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+      }
+
+      @keyframes pop {
+        from {
+          transform: scale(0.9);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .price {
+        color: #2a7fff;
+        font-weight: bold;
+      }
+      .sale {
+        color: green;
+        font-weight: bold;
+      }
+      .profit {
+        color: #ff9800;
+        font-weight: bold;
+      }
+      .small {
+        font-size: 13px;
+        color: gray;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>💊 Pharmacy Management System</h1>
+      <div id="stats">💰 Profit: 0</div>
+    </header>
+
+    <div class="container">
+      <!-- LEFT PANEL -->
+      <div class="panel">
+        <h3>Add Medicine</h3>
+        <input id="name" placeholder="Medicine Name" />
+        <input id="price" type="number" placeholder="Purchase Price" />
+        <input id="sell" type="number" placeholder="Selling Price" />
+        <input id="qty" type="number" placeholder="Quantity" />
+        <button onclick="addMedicine()">➕ Add Medicine</button>
+
+        <hr style="margin: 15px 0" />
+        <h3>Quick Sale</h3>
+        <input id="saleName" placeholder="Medicine Name" />
+        <input id="saleQty" type="number" placeholder="Qty" />
+        <button onclick="sellMedicine()">💸 Sell</button>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="panel">
+        <h3>Inventory</h3>
+        <div class="products" id="list"></div>
+      </div>
+    </div>
+
+    <script>
+      let products = [];
+      let profit = 0;
+
+      function addMedicine() {
+        let n = document.getElementById("name").value;
+        let p = +document.getElementById("price").value;
+        let s = +document.getElementById("sell").value;
+        let q = +document.getElementById("qty").value;
+
+        if (!n || !p || !s || !q) return alert("Fill all fields");
+
+        products.push({ name: n, purchase: p, sell: s, qty: q });
+        render();
+      }
+
+      function sellMedicine() {
+        let n = document.getElementById("saleName").value;
+        let q = +document.getElementById("saleQty").value;
+
+        let item = products.find(
+          (p) => p.name.toLowerCase() === n.toLowerCase(),
+        );
+
+        if (!item) return alert("Not found");
+        if (item.qty < q) return alert("Not enough stock");
+
+        item.qty -= q;
+        profit += (item.sell - item.purchase) * q;
+
+        updateStats();
+        render();
+      }
+
+      function updateStats() {
+        document.getElementById("stats").innerText = "💰 Profit: " + profit;
+      }
+
+      function render() {
+        let list = document.getElementById("list");
+        list.innerHTML = "";
+
+        products.forEach((p) => {
+          list.innerHTML += `
+<div class='card'>
+<h3>${p.name}</h3>
+<p class='small'>Stock: ${p.qty}</p>
+<p class='price'>Buy: ${p.purchase}</p>
+<p class='sale'>Sell: ${p.sell}</p>
+<p class='profit'>Profit/unit: ${p.sell - p.purchase}</p>
+</div>
+`;
+        });
+      }
+    </script>
+  </body>
+</html>
